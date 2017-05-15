@@ -1,4 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../iron-form/iron-form.html">
+
+<link rel="import" href="../ct-shared-styles/ct-application-theme.html">
+<link rel="import" href="../ct-editable-switcher/ct-editable-switcher.html">
 
 <!--
 `ct-view-settings-distributors`
@@ -9,26 +17,290 @@ Element to add and view distributor settings
 
 <dom-module id="ct-view-settings-distributors">
   <template>
-    <style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style is="custom-styles">
       :host {
         display: block;
       }
+
+      .new-container .row {
+        display: flex;
+        align-items: center;
+      }
+
+      paper-material {
+        background: #fff;
+        margin-bottom: 15px;
+        padding: 10px;
+      }
+
+      paper-icon-button + paper-icon-button {
+        margin-left: 15px;
+      }
+
+
     </style>
-    <h2>Hello [[prop1]]!</h2>
+
+    <paper-material>
+      <div class="fluid-container new-container">
+        <form
+                is="iron-form"
+                class="row"
+                id="newForm"
+                disable-native-validation-ui
+                novalidate>
+
+          <div class="col-sm-3">
+            <paper-input
+                    id="newDistName"
+                    label="New Distributor Name"
+                    required
+                    error-message="Please provide a name for the new distributor"
+                    type="text"></paper-input>
+          </div>
+
+
+          <div class="col-sm-3">
+            <paper-input
+                    id="newDistNumber"
+                    label="New Distributor Number"
+                    required
+                    error-message="Please provide a number for the new distributor"
+                    type="text"></paper-input>
+          </div>
+
+          <div class="col-sm-3">
+            <paper-input
+                    id="newDistAddress"
+                    label="New Distributor Address"
+                    required
+                    error-message="Please provide an address for the new distributor"
+                    type="text"></paper-input>
+          </div>
+
+
+
+          <div class="col-sm-3">
+            <paper-button class="btn btn-primary btn-block" on-tap="_formHandler" raised>Add Distributor</paper-button>
+          </div>
+        </form>
+      </div>
+    </paper-material>
+
+    <paper-material>
+
+      <div class="fluid-container">
+
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered table-hover table-middle">
+                <thead>
+                <th>Distributor Name</th>
+                <th>Contact Number</th>
+                <th>Address</th>
+                <th>Actions</th>
+                </thead>
+                <tbody>
+
+                <template is="dom-repeat" items="{{meterDataTemp}}">
+                  <tr>
+                    <td>
+                      <ct-editable-switcher class$="[[_computeId(index)]]">
+                        <paper-input
+                                class="input-element"
+                                type="text"
+                                required
+                                error-message="Please enter distibutor name"
+                                no-label
+                                value="[[item.name]]"></paper-input>
+                      </ct-editable-switcher>
+                    </td>
+                    <td>
+                      <ct-editable-switcher class$="[[_computeId(index)]]">
+                        <paper-input
+                                class="input-element"
+                                type="text"
+                                allowed-pattern="[0-9\.]"
+                                required
+                                error-message="Please enter distibutor contact number"
+                                no-label
+                                value="[[item.num]]"></paper-input>
+                      </ct-editable-switcher>
+                    </td>
+                    <td>
+                      <ct-editable-switcher class$="[[_computeId(index)]]">
+                        <paper-input
+                                class="input-element"
+                                type="text"
+                                required
+                                error-message="Please enter distibutor address"
+                                no-label
+                                value="[[item.address]]"></paper-input>
+                      </ct-editable-switcher>
+                    </td>
+                    <td class="text-center">
+                      <paper-icon-button icon="create" class="table-button btn-default btn-sm" on-tap="_editHandler" raised></paper-icon-button>
+                      <paper-icon-button icon="delete" data-item-id="[[index]]" class="table-button btn-danger btn-sm" on-tap="_modalHandler" raised></paper-icon-button>
+                    </td>
+                  </tr>
+                </template>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </paper-material>
+
+    <paper-dialog
+            id="meterModal"
+            modal
+            no-cancel-on-esc-key
+            no-cancel-on-outside-click
+            on-iron-overlay-opened="_patchOverlay" >
+      <h2>Please Confirm Distributor Deletion</h2>
+      <p>
+        Are you sure you want to delete this distributor?
+      </p>
+      <div class="buttons">
+        <paper-button class="btn btn-default" dialog-dismiss>Cancel</paper-button>
+        <paper-button class="btn btn-danger" dialog-confirm on-tap="_deleteDistributor">Delete</paper-button>
+      </div>
+    </paper-dialog>
+
   </template>
 
   <script>
-    Polymer({
+      Polymer({
 
-      is: 'ct-view-settings-distributors',
+          is: 'ct-view-settings-distributors',
 
-      properties: {
-        prop1: {
-          type: String,
-          value: 'ct-view-settings-distributors',
-        },
-      },
+          properties: {
+              _isStatusEdit : {
+                  type: Boolean,
+                  value: function() {
+                      return false;
+                  }
+              },
 
-    });
+              _deleteId: Number,
+
+              meterDataTemp : {
+                  type: Array,
+                  value: function(){
+                      return [
+                          {
+                              'id' : 1,
+                              'name' : "Meter Number 5",
+                              'num' : '123456789',
+                              'address' : '12 Rugley Rd, Vredehoek, Ape Town, 8001'
+                          },
+                          {
+                              'id' : 2,
+                              'name' : "Meter Number 6",
+                              'num' : '123456789',
+                              'address' : '12 Rugley Rd, Vredehoek, Ape Town, 8001'
+                          }
+                      ]
+                  }
+              }
+          },
+
+          listeners: {
+              'iron-form-presubmit':'_formHandler'
+          },
+
+          _formHandler : function(e){
+
+              e.preventDefault();
+
+              var form = this.$.newForm;
+
+              if(form.validate()) {
+                  var formData = form.serialize();
+                  console.log('params', formData);
+                  this.fire('addDistributor', formData);
+              }
+
+          },
+
+          _computeId : function(idx){
+              return 'item-'+idx;
+          },
+
+          _computeButtonIcon: function(element){
+              if(icon === 'save') {
+                  element.setAttribute('icon', 'create');
+              } else if(icon === 'create') {
+                  element.setAttribute('icon', 'save');
+              }
+          },
+
+          _computeBtnStyle : function(element){
+              if(element.classList.contains('btn-primary')) {
+                  element.classList.remove('btn-primary');
+                  element.classList.add('btn-default');
+              } else if(element.classList.contains('btn-default')){
+                  element.classList.remove('btn-default');
+                  element.classList.add('btn-primary');
+              }
+          },
+
+          _toggleStatus : function(element){
+
+              var icon = element.getAttribute('icon');
+
+          },
+
+          _editHandler : function(e){
+              var idIdx = '.item-'+e.model.index;
+              var inputElems = Polymer.dom(this.root).querySelectorAll(idIdx);
+              var isValid = true;
+
+              inputElems.forEach(function(elem){
+
+                  console.log(elem.validate())
+                  if(elem.editMode && !elem.validate()){
+                      console.log('called');
+                      isValid = false;
+                  }
+
+                  if(isValid){
+                      elem.editMode = !elem.editMode;
+                  }
+
+
+              });
+
+              if(isValid){
+                  this._toggleStatus(Polymer.dom(e).localTarget);
+              }
+
+
+          },
+
+          _modalHandler : function(e){
+              this._deleteId = e.model.item.id;
+              this.$.meterModal.open();
+          },
+
+          _deleteDistributor : function(e) {
+              console.info('poof! , id: '+this._deleteId+' has been deleted')
+          },
+
+          _patchOverlay: function (e) {
+              if (e.target.withBackdrop) {
+                  e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+              }
+          },
+
+
+      });
   </script>
+
 </dom-module>
+
