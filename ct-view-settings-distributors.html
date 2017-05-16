@@ -21,7 +21,25 @@ Element to add and view distributor settings
     <style is="custom-styles">
       :host {
         display: block;
+        --paper-input-container:{
+          border-top: 1px solid #ccc;
+          border-left: 1px solid #ccc;
+          border-right: 1px solid #ccc;
+          border-bottom: none;
+          padding: 0 !important;
+        };
+
+        --paper-input-container-input: {
+          text-overflow: ellipsis;
+          width: calc(100% - 20px);
+          margin-left: 10px;
+        };
+
+        --paper-input-container-label: {
+          margin-left: 10px;
+        };
       }
+
 
       .new-container .row {
         display: flex;
@@ -34,8 +52,13 @@ Element to add and view distributor settings
         padding: 10px;
       }
 
+
       paper-icon-button + paper-icon-button {
         margin-left: 15px;
+      }
+      paper-input {
+        text-overflow: ellipsis;
+        width: calc(~100% - 10px);
       }
 
 
@@ -303,4 +326,3 @@ Element to add and view distributor settings
   </script>
 
 </dom-module>
-
