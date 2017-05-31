@@ -40,7 +40,6 @@ Element to add and view distributor settings
         };
       }
 
-
       .new-container .row {
         display: flex;
         align-items: center;
@@ -68,19 +67,24 @@ Element to add and view distributor settings
 
     </style>
 
+
+
     <paper-material>
       <div class="fluid-container new-container margin-10v">
         <form
                 is="iron-form"
                 class="row"
-                id="newForm"
+                id="form"
                 disable-native-validation-ui
+                method="POST"
                 novalidate>
 
           <div class="col-sm-3">
             <paper-input
                     id="newDistName"
                     label="New Distributor Name"
+                    type="text"
+                    name="name"
                     required
                     error-message="Please provide a name for the new distributor"
                     type="text"></paper-input>
@@ -92,6 +96,7 @@ Element to add and view distributor settings
                     id="newDistNumber"
                     label="New Distributor Number"
                     required
+                    name="contactNumber"
                     error-message="Please provide a number for the new distributor"
                     type="text"></paper-input>
           </div>
@@ -101,14 +106,12 @@ Element to add and view distributor settings
                     id="newDistAddress"
                     label="New Distributor Address"
                     required
+                    name="address"
                     error-message="Please provide an address for the new distributor"
                     type="text"></paper-input>
           </div>
-
-
-
           <div class="col-sm-3">
-            <paper-button class="btn btn-primary btn-block" on-tap="_formHandler" raised>Add Distributor</paper-button>
+            <paper-button class="btn btn-primary btn-block" on-tap="_submitForm" raised>Add Distributor</paper-button>
           </div>
         </form>
       </div>
@@ -130,7 +133,7 @@ Element to add and view distributor settings
                 </thead>
                 <tbody>
 
-                <template is="dom-repeat" items="{{meterDataTemp}}">
+                <template is="dom-repeat" items="{{getDistributorDetails}}">
                   <tr>
                     <td>
                       <ct-editable-switcher class$="[[_computeId(index)]]">
@@ -152,7 +155,7 @@ Element to add and view distributor settings
                                 required
                                 error-message="Please enter distibutor contact number"
                                 no-label
-                                value="[[item.num]]"></paper-input>
+                                value="[[item.contactNumber]]"></paper-input>
                       </ct-editable-switcher>
                     </td>
                     <td>
@@ -215,6 +218,8 @@ Element to add and view distributor settings
               },
 
               _deleteId: Number,
+              getDistributorDetails:Array,
+              selected: Number,
 
               meterDataTemp : {
                   type: Array,
@@ -241,18 +246,27 @@ Element to add and view distributor settings
               'iron-form-presubmit':'_formHandler'
           },
 
+          _submitForm : function() {
+              this.$.form.submit();
+          },
+
           _formHandler : function(e){
 
               e.preventDefault();
 
-              var form = this.$.newForm;
+              var form = this.$.form;
 
               if(form.validate()) {
                   var formData = form.serialize();
+                  data = {};
+                  data.name = formData.name;
+                  data.contactNumber = formData.contactNumber;
+                  data.address = formData.address;
+
                   console.log('params', formData);
                   this.fire('addDistributor', formData);
               }
-
+              this.fire('addDistributor', data);
           },
 
           _computeId : function(idx){
