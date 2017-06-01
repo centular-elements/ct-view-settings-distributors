@@ -4,6 +4,7 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../iron-form/iron-form.html">
+<link rel="import" href="../ct-core-utils/ct-api-consumer-behaviour.html">
 
 <link rel="import" href="../ct-editable-switcher/ct-editable-switcher.html">
 
@@ -133,7 +134,7 @@ Element to add and view distributor settings
                 </thead>
                 <tbody>
 
-                <template is="dom-repeat" items="{{getDistributorDetails}}">
+                <template is="dom-repeat" items="{{distributorDetailsList}}">
                   <tr>
                     <td>
                       <ct-editable-switcher class$="[[_computeId(index)]]">
@@ -218,28 +219,8 @@ Element to add and view distributor settings
               },
 
               _deleteId: Number,
-              getDistributorDetails:Array,
+              distributorDetailsList:Array,
               selected: Number,
-
-              meterDataTemp : {
-                  type: Array,
-                  value: function(){
-                      return [
-                          {
-                              'id' : 1,
-                              'name' : "Meter Number 5",
-                              'num' : '123456789',
-                              'address' : '12 Rugley Rd, Vredehoek, Ape Town, 8001'
-                          },
-                          {
-                              'id' : 2,
-                              'name' : "Meter Number 6",
-                              'num' : '123456789',
-                              'address' : '12 Rugley Rd, Vredehoek, Ape Town, 8001'
-                          }
-                      ]
-                  }
-              }
           },
 
           listeners: {
@@ -264,7 +245,7 @@ Element to add and view distributor settings
                   data.address = formData.address;
 
                   console.log('params', formData);
-                  this.fire('addDistributor', formData);
+
               }
               this.fire('addDistributor', data);
           },
