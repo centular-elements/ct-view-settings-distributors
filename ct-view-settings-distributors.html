@@ -133,8 +133,13 @@ Element to add and view distributor settings
                 <th class="text-center">Actions</th>
                 </thead>
                 <tbody>
-
                 <template is="dom-repeat" items="{{distributorDetailsList}}">
+                  <form
+                          is="iron-form"
+                          id="form-[[item.id]]"
+                          disable-native-validation-ui
+                          method="PUT"
+                          novalidate>
                   <tr>
                     <td>
                       <ct-editable-switcher class$="[[_computeId(index)]]">
@@ -172,11 +177,11 @@ Element to add and view distributor settings
                     </td>
                     <td class="text-center">
                       <paper-icon-button icon="create" class="table-button btn-default btn-sm" on-tap="_editHandler" raised></paper-icon-button>
-                      <paper-icon-button icon="delete" data-item-id="[[index]]" class="table-button btn-danger btn-sm" on-tap="_modalHandler" raised></paper-icon-button>
+                      <paper-icon-button icon="delete"  data-item-id$="[[item.id]]" class="table-button btn-danger btn-sm" on-tap="_modalHandler" raised></paper-icon-button>
                     </td>
                   </tr>
+                  </form>
                 </template>
-
                 </tbody>
               </table>
             </div>
@@ -199,7 +204,7 @@ Element to add and view distributor settings
       </p>
       <div class="buttons">
         <paper-button class="btn btn-default" dialog-dismiss>Cancel</paper-button>
-        <paper-button class="btn btn-danger" dialog-confirm on-tap="_deleteDistributor">Delete</paper-button>
+        <paper-button class="btn btn-danger"  ident$="{{item.id}}" data-item-id$="[[item.id]]" dialog-confirm on-tap="_deleteDistributor">Delete</paper-button>
       </div>
     </paper-dialog>
 
@@ -305,13 +310,41 @@ Element to add and view distributor settings
 
           },
 
+          // _editHandler : function(){
+          //     var form = this.$$('form-'+e.model.id);
+          //     if(this._isStateEdit){
+          //         if(form.validate()){
+          //             form.submit();
+          //         }
+          //     } else {
+          //         this._toggleStatus();
+          //     }
+          // },
+
+          _formHandler : function(e){
+
+              var editForm = this.$$('form-'+e.model.id).serialize();
+                  data = {},
+
+              e.preventDefault();
+
+              data.name = editForm.name;
+              data.contactNumber = editForm.contactNumber;
+              data.address = editForm.address;
+
+              this.fire('updateDistributor', params);
+              this._toggleStatus();
+          },
+
+
           _modalHandler : function(e){
               this._deleteId = e.model.item.id;
               this.$.meterModal.open();
           },
 
           _deleteDistributor : function(e) {
-              console.info('poof! , id: '+this._deleteId+' has been deleted')
+              this.fire('deleteDistributor', e.target.getAttribute('ident'));
+               console.info('poof! , id: '+this._deleteId+' has been deleted')
           },
 
           _patchOverlay: function (e) {
