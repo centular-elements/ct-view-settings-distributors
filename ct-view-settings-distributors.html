@@ -59,7 +59,7 @@ Element to add and view distributor settings
 
       paper-icon-button + paper-icon-button {
         margin-left: 15px;
-      }  this.fire('deleteDistributor', e.detail.id);
+      }
       paper-input {
         text-overflow: ellipsis;
         width: calc(~100% - 10px);
@@ -213,7 +213,8 @@ Element to add and view distributor settings
           },
 
           listeners: {
-              'iron-form-presubmit':'_formHandler'
+              'iron-form-presubmit':'_formHandler',
+              'delete' : '_deleteDistributor'
           },
 
           _submitForm : function() {
@@ -232,9 +233,6 @@ Element to add and view distributor settings
                   data.name = formData.name;
                   data.contactNumber = formData.contactNumber;
                   data.address = formData.address;
-
-                  console.log('params', formData);
-
               }
               this.fire('addDistributor', data);
           },
@@ -310,7 +308,7 @@ Element to add and view distributor settings
               var editForm = this.$$('form-'+e.model.id).serialize();
                   data = {},
 
-              e.preventDefault();
+              e.preventDefault();_formHandler
 
               data.name = editForm.name;
               data.contactNumber = editForm.contactNumber;
@@ -323,11 +321,12 @@ Element to add and view distributor settings
           _modalHandler : function(e){
             this.$.deleteDialog.key = e.model.item.id;
             this.$.deleteDialog.resource = e.model.item.name
+            this.$.deleteDialog.subject = "Distrubutor"
             this.$.deleteDialog.open();
           },
 
           _deleteDistributor : function(e) {
-              this.fire('deleteDistributor', e.detail.id);
+              this.fire('deleteDistributor', e.detail);
           },
       });
   </script>
