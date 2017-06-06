@@ -59,7 +59,7 @@ Element to add and view distributor settings
 
       paper-icon-button + paper-icon-button {
         margin-left: 15px;
-      }
+      }  this.fire('deleteDistributor', e.detail.id);
       paper-input {
         text-overflow: ellipsis;
         width: calc(~100% - 10px);
@@ -134,14 +134,13 @@ Element to add and view distributor settings
                 </thead>
                 <tbody>
                 <template is="dom-repeat" items="{{distributorDetailsList}}">
-
+                  <form
+                          is="iron-form"
+                          id="form-[[item.id]]"
+                          disable-native-validation-ui
+                          method="PUT"
+                          novalidate>
                   <tr>
-                    <form
-                            is="iron-form"
-                            id="form-[[item.id]]"
-                            disable-native-validation-ui
-                            method="PUT"
-                            novalidate>
                     <td>
                       <ct-editable-switcher class$="[[_computeId(index)]]">
                         <paper-input
@@ -180,8 +179,8 @@ Element to add and view distributor settings
                       <paper-icon-button icon="create" class="table-button btn-default btn-sm" on-tap="_editHandler" raised></paper-icon-button>
                       <paper-icon-button icon="delete"  data-item-id$="[[item.id]]" class="table-button btn-danger btn-sm" on-tap="_modalHandler" raised></paper-icon-button>
                     </td>
-                    </form>
                   </tr>
+                  </form>
                 </template>
                 </tbody>
               </table>
@@ -193,7 +192,7 @@ Element to add and view distributor settings
 
     </paper-material>
 
-    <ct-delete-dialog id='deleteDialog'  subject"Distributor" resource="First distrubutor" key="[[_deleteId]]"></ct-delete-dialog>
+    <ct-delete-dialog id='deleteDialog'  subject"Distributor"></ct-delete-dialog>
 
   </template>
 
@@ -261,7 +260,7 @@ Element to add and view distributor settings
                   element.classList.add('btn-primary');
               }
           },
-
+distributor
           _toggleStatus : function(element){
 
               var icon = element.getAttribute('icon');
@@ -321,24 +320,15 @@ Element to add and view distributor settings
               this._toggleStatus();
           },
 
-
           _modalHandler : function(e){
-              this.$.deleteDialog.key = e.model.item.id;
-              this.$.deleteDialog.open();
+            this.$.deleteDialog.key = e.model.item.id;
+            this.$.deleteDialog.resource = e.model.item.name
+            this.$.deleteDialog.open();
           },
 
           _deleteDistributor : function(e) {
-              this.fire('deleteDistributor', e.target.getAttribute('ident'));
-               console.info('poof! , id: '+this._deleteId+' has been deleted')
+              this.fire('deleteDistributor', e.detail.id);
           },
-
-          _patchOverlay: function (e) {
-              if (e.target.withBackdrop) {
-                  e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
-              }
-          },
-
-
       });
   </script>
 
