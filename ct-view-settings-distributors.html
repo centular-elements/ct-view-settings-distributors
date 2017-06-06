@@ -5,7 +5,7 @@
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../iron-form/iron-form.html">
 <link rel="import" href="../ct-core-utils/ct-api-consumer-behaviour.html">
-
+<link rel="import" href="../ct-delete-dialog/ct-delete-dialog.html">
 <link rel="import" href="../ct-editable-switcher/ct-editable-switcher.html">
 
 <!--
@@ -192,21 +192,7 @@ Element to add and view distributor settings
 
     </paper-material>
 
-    <paper-dialog
-            id="meterModal"
-            modal
-            no-cancel-on-esc-key
-            no-cancel-on-outside-click
-            on-iron-overlay-opened="_patchOverlay" >
-      <h2>Please Confirm Distributor Deletion</h2>
-      <p>
-        Are you sure you want to delete this distributor?
-      </p>
-      <div class="buttons">
-        <paper-button class="btn btn-default" dialog-dismiss>Cancel</paper-button>
-        <paper-button class="btn btn-danger"  ident$="{{item.id}}" data-item-id$="[[item.id]]" dialog-confirm on-tap="_deleteDistributor">Delete</paper-button>
-      </div>
-    </paper-dialog>
+    <ct-delete-dialog id='deleteDialog'  subject"Distributor" resource="First distrubutor" key="[[_deleteId]]"></ct-delete-dialog>
 
   </template>
 
@@ -222,8 +208,6 @@ Element to add and view distributor settings
                       return false;
                   }
               },
-
-              _deleteId: Number,
               distributorDetailsList:Array,
               selected: Number,
           },
@@ -338,8 +322,8 @@ Element to add and view distributor settings
 
 
           _modalHandler : function(e){
-              this._deleteId = e.model.item.id;
-              this.$.meterModal.open();
+              this.$.deleteDialog.key = e.model.item.id;
+              this.$.deleteDialog.open();
           },
 
           _deleteDistributor : function(e) {
