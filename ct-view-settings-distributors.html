@@ -214,7 +214,7 @@ Element to add and view distributor settings
     <ct-delete-dialog id='deleteDialog'  subject"Distributor"></ct-delete-dialog>
   </template>
   <script>
-      Polymer({
+  Polymer({
           is: 'ct-view-settings-distributors',
           properties: {
               _isStatusEdit : {
@@ -226,22 +226,17 @@ Element to add and view distributor settings
               distributorDetailsList:Array,
               selected: Number,
           },
-
           listeners: {
               'iron-form-presubmit':'_formHandler',
-              'delete' : '_deleteDistributor'
+              'delete' : '_deleteDistributor',
+              '_fomrHandler': '_editFormHandler'
           },
-
           _submitForm : function() {
               this.$.form.submit();
           },
-
           _formHandler : function(e){
-
               e.preventDefault();
-
               var form = this.$.form;
-
               if(form.validate()) {
                   var formData = form.serialize();
                   data = {};
@@ -251,11 +246,9 @@ Element to add and view distributor settings
               }
               this.fire('addDistributor', data);
           },
-
           _computeId : function(idx){
               return 'item-'+idx;
           },
-
           _computeButtonIcon: function(element){
               if(icon === 'save') {
                   element.setAttribute('icon', 'create');
@@ -263,7 +256,6 @@ Element to add and view distributor settings
                   element.setAttribute('icon', 'save');
               }
           },
-
           _computeBtnStyle : function(element){
               if(element.classList.contains('btn-primary')) {
                   element.classList.remove('btn-primary');
@@ -273,73 +265,55 @@ Element to add and view distributor settings
                   element.classList.add('btn-primary');
               }
           },
-
           _toggleStatus : function(element){
-
-              var icon = element.getAttribute('icon');
-
+              //toggles between editable and non editable
+              this._isStateEdit = !this._isStateEdit;
           },
-
           _editHandler : function(e){
               var idIdx = '.item-'+e.model.index;
               var inputElems = Polymer.dom(this.root).querySelectorAll(idIdx);
               var isValid = true;
-
-              inputElems.forEach(function(elem){
-
-                  console.log(elem.validate())
-                  if(elem.editMode && !elem.validate()){
-                      console.log('called');
-                      isValid = false;
-                  }
-
-                  if(isValid){
-                      elem.editMode = !elem.editMode;
-                  }
-
-
-              });
-
-              if(isValid){
-                  this._toggleStatus(Polymer.dom(e).localTarget);
-              }
-
-
+              //if in editing state
+              if(this._isStateEdit){
+                inputElems.forEach(function(elem){
+                    if(elem.editMode && !elem.validate()){
+                        isValid = false;
+                    }
+                    if(isValid){
+                        elem.editMode = !elem.editMode;
+                    }
+                });
+                //submit the form
+                if(isValid){
+                  this._editFormHandler(e);
+                }
+              //make editable
+              } else {
+                 this._toggleStatus();
+               }
           },
-
-          // _editHandler : function(){
-          //     var form = this.$$('form-'+e.model.id);
-          //     if(this._isStateEdit){
-          //         if(form.validate()){
-          //             form.submit();
-          //         }
-          //     } else {
-          //         this._toggleStatus();
-          //     }
-          // },
-
-          _formHandler : function(e){
-
-              var editForm = this.$$('form-'+e.model.id).serialize();
-                  data = {},
-
-              e.preventDefault();_formHandler
-
+           _editFormHandler: function(e){
+             var idIdx = '#form-'+e.model.item.id;
+             var formElems = this.$$(idIdx);
+             if(!formElems.validate()){
+                return;
+              }
+              var editForm = formElems.serialize()
+                  data = {};
+              e.preventDefault();
+              data.id = e.model.item.id;
               data.name = editForm.name;
               data.contactNumber = editForm.contactNumber;
               data.address = editForm.address;
-
-              this.fire('updateDistributor', params);
+              this.fire('updateDistributor', data);
               this._toggleStatus();
           },
-
           _modalHandler : function(e){
             this.$.deleteDialog.key = e.model.item.id;
             this.$.deleteDialog.resource = e.model.item.name
             this.$.deleteDialog.subject = "Distrubutor"
             this.$.deleteDialog.open();
           },
-
           _deleteDistributor : function(e) {
               this.fire('deleteDistributor', e.detail);
           },
