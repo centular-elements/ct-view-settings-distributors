@@ -74,12 +74,13 @@ Element to add and view distributor settings
         width: calc(~100% - 10px);
       }
     </style>
+    <ct-distrubutor-api id="distributorsApi"></ct-distrubutor-api>
     <paper-material>
       <div class="fluid-container new-container margin-10v">
         <form
                 is="iron-form"
                 class="row"
-                id="form"
+                id="newDistributor"
                 disable-native-validation-ui
                 method="POST"
                 novalidate>
@@ -112,7 +113,7 @@ Element to add and view distributor settings
                     type="text"></paper-input>
           </div>
           <div class="col-sm-2 bordered">
-            <paper-button class="btn btn-primary btn-block" on-tap="_submitForm" raised>Add Distributor</paper-button>
+            <paper-button class="btn btn-primary btn-block" on-tap="_newHandler" raised>Add Distributor</paper-button>
           </div>
         </form>
       </div>
@@ -143,7 +144,7 @@ Element to add and view distributor settings
                     </div>
                   </div>
                 </div>
-                <template is="dom-repeat" items="{{distributorDetailsList}}">
+                <template is="dom-repeat" items="{{_distributorDetailsList}}">
                   <div class="row dom-repeated-row margin-10v">
                     <form
                             is="iron-form"
@@ -209,13 +210,119 @@ Element to add and view distributor settings
             </div>
           </div>
         </div>
-
     </paper-material>
     <ct-delete-dialog id='deleteDialog'  subject"Distributor"></ct-delete-dialog>
   </template>
   <script>
+  // Polymer({
+  //         is: 'ct-view-settings-distributors',
+  //         properties: {
+  //             _isStatusEdit : {
+  //                 type: Boolean,
+  //                 value: function() {
+  //                     return false;
+  //                 }
+  //             },
+  //             distributorDetailsList:Array,
+  //             selected: Number,
+  //         },
+  //         listeners: {
+  //             'iron-form-presubmit':'_formHandler',
+  //             'delete' : '_deleteDistributor',
+  //             '_fomrHandler': '_editFormHandler'
+  //         },
+  //         _submitForm : function() {
+  //             this.$.form.submit();
+  //         },
+  //         _formHandler : function(e){
+  //             e.preventDefault();
+  //             var form = this.$.form;
+  //             if(form.validate()) {
+  //                 var formData = form.serialize();
+  //                 data = {};
+  //                 data.name = formData.name;
+  //                 data.contactNumber = formData.contactNumber;
+  //                 data.address = formData.address;
+  //             }
+  //             this.fire('addDistributor', data);
+  //         },
+  //         _computeId : function(idx){
+  //             return 'item-'+idx;
+  //         },
+  //         _computeButtonIcon: function(element){
+  //             if(icon === 'save') {
+  //                 element.setAttribute('icon', 'create');
+  //             } else if(icon === 'create') {
+  //                 element.setAttribute('icon', 'save');
+  //             }
+  //         },
+  //         _computeBtnStyle : function(element){
+  //             if(element.classList.contains('btn-primary')) {
+  //                 element.classList.remove('btn-primary');
+  //                 element.classList.add('btn-default');
+  //             } else if(element.classList.contains('btn-default')){
+  //                 element.classList.remove('btn-default');
+  //                 element.classList.add('btn-primary');
+  //             }
+  //         },
+  //         _toggleStatus : function(element){
+  //             //toggles between editable and non editable
+  //             this._isStateEdit = !this._isStateEdit;
+  //         },
+  //         _editHandler : function(e){
+  //             var idIdx = '.item-'+e.model.index;
+  //             var inputElems = Polymer.dom(this.root).querySelectorAll(idIdx);
+  //             var isValid = true;
+  //             //if in editing state
+  //             if(this._isStateEdit){
+  //               inputElems.forEach(function(elem){
+  //                   if(elem.editMode && !elem.validate()){
+  //                       isValid = false;
+  //                   }
+  //                   if(isValid){
+  //                       elem.editMode = !elem.editMode;
+  //                   }
+  //               });
+  //               //submit the form
+  //               if(isValid){
+  //                 this._editFormHandler(e);
+  //               }
+  //             //make editable
+  //             } else {
+  //                this._toggleStatus();
+  //              }
+  //         },
+  //          _editFormHandler: function(e){
+  //            var idIdx = '#form-'+e.model.item.id;
+  //            var formElems = this.$$(idIdx);
+  //            if(!formElems.validate()){
+  //               return;
+  //             }
+  //             var editForm = formElems.serialize()
+  //                 data = {};
+  //             e.preventDefault();
+  //             data.id = e.model.item.id;
+  //             data.name = editForm.name;
+  //             data.contactNumber = editForm.contactNumber;
+  //             data.address = editForm.address;
+  //             this.fire('updateDistributor', data);
+  //             this._toggleStatus();
+  //         },
+  //         _modalHandler : function(e){
+  //           this.$.deleteDialog.key = e.model.item.id;
+  //           this.$.deleteDialog.resource = e.model.item.name
+  //           this.$.deleteDialog.subject = "Distrubutor"
+  //           this.$.deleteDialog.open();
+  //         },
+  //         _deleteDistributor : function(e) {
+  //             this.fire('deleteDistributor', e.detail);
+  //         },
+  //     });
+
   Polymer({
+
           is: 'ct-view-settings-distributors',
+
           properties: {
               _isStatusEdit : {
                   type: Boolean,
@@ -223,32 +330,24 @@ Element to add and view distributor settings
                       return false;
                   }
               },
-              distributorDetailsList:Array,
-              selected: Number,
+
+              _distributorDetailsList : {
+                  type: Array,
+                  notify : true
+              },
+              refreshing: {
+                  type: Boolean,
+                  notify: true
+              },
           },
           listeners: {
-              'iron-form-presubmit':'_formHandler',
-              'delete' : '_deleteDistributor',
-              '_fomrHandler': '_editFormHandler'
+              'delete' : '_delete'
           },
-          _submitForm : function() {
-              this.$.form.submit();
-          },
-          _formHandler : function(e){
-              e.preventDefault();
-              var form = this.$.form;
-              if(form.validate()) {
-                  var formData = form.serialize();
-                  data = {};
-                  data.name = formData.name;
-                  data.contactNumber = formData.contactNumber;
-                  data.address = formData.address;
-              }
-              this.fire('addDistributor', data);
-          },
+
           _computeId : function(idx){
               return 'item-'+idx;
           },
+
           _computeButtonIcon: function(element){
               if(icon === 'save') {
                   element.setAttribute('icon', 'create');
@@ -256,6 +355,7 @@ Element to add and view distributor settings
                   element.setAttribute('icon', 'save');
               }
           },
+
           _computeBtnStyle : function(element){
               if(element.classList.contains('btn-primary')) {
                   element.classList.remove('btn-primary');
@@ -265,57 +365,116 @@ Element to add and view distributor settings
                   element.classList.add('btn-primary');
               }
           },
-          _toggleStatus : function(element){
-              //toggles between editable and non editable
-              this._isStateEdit = !this._isStateEdit;
+
+          _toggleStatus : function(e){
+              e._isStateEdit = !e._isStateEdit;
           },
+
           _editHandler : function(e){
-              var idIdx = '.item-'+e.model.index;
-              var inputElems = Polymer.dom(this.root).querySelectorAll(idIdx);
-              var isValid = true;
-              //if in editing state
-              if(this._isStateEdit){
-                inputElems.forEach(function(elem){
-                    if(elem.editMode && !elem.validate()){
-                        isValid = false;
-                    }
-                    if(isValid){
-                        elem.editMode = !elem.editMode;
-                    }
-                });
-                //submit the form
-                if(isValid){
-                  this._editFormHandler(e);
+
+              var switcherID = '#item-'+ e.model.index;
+              var switcher = this.$$(switcherID);
+
+              if(switcher.editMode){
+                if(switcher.validate()){
+                  var inputID = '#item-'+ e.model.item.id;
+                  var value = this.$$(inputID).value;
+                  switcher.editMode = !switcher.editMode;
+                  //send the body for the update
+                  this._update({"id": value}, e.model.item.id);
+                  this._update({"name": value}, e.model.item.name);
+                  this._update({"contactNumber": value}, e.model.item.contactNumber)
+                  this._update({"address": value}, e.model.item.address)
                 }
-              //make editable
-              } else {
-                 this._toggleStatus();
-               }
-          },
-           _editFormHandler: function(e){
-             var idIdx = '#form-'+e.model.item.id;
-             var formElems = this.$$(idIdx);
-             if(!formElems.validate()){
-                return;
+              }else{
+                switcher.editMode = !switcher.editMode
               }
-              var editForm = formElems.serialize()
-                  data = {};
-              e.preventDefault();
-              data.id = e.model.item.id;
-              data.name = editForm.name;
-              data.contactNumber = editForm.contactNumber;
-              data.address = editForm.address;
-              this.fire('updateDistributor', data);
-              this._toggleStatus();
+          },
+
+          _newHandler : function(){
+
+              var newDistributorInput = this.$.newDistributor;
+               this._add(obj)
+
+
+              if(newModelInput.validate()){
+                var obj = {
+                  "id" : newDistributorInput.id,
+                  "name" : newDistributorInput.name,
+                  "contactNumber" : newDistributorInput.contactNumber,
+                  "address" : newDistributorInput.address
+                }
+
+                this._add(obj)
+              }
+
+          },
+          ready : function(){
+              this.init();
+          },
+
+          refresh: function() {
+              this.init();
+          },
+          init : function(){
+              this.refreshing = true;
+          //    this._getList();
           },
           _modalHandler : function(e){
             this.$.deleteDialog.key = e.model.item.id;
             this.$.deleteDialog.resource = e.model.item.name
-            this.$.deleteDialog.subject = "Distrubutor"
+            this.$.deleteDialog.subject = "Distributor"
             this.$.deleteDialog.open();
           },
-          _deleteDistributor : function(e) {
-              this.fire('deleteDistributor', e.detail);
+
+          /* Meter Modal Calls */
+
+          //return list function
+          _getList : function(){
+             //TODO: add paging!!!!
+              this.$.distributorsApi.getDistributorDetails(1, 20)
+                  .then(function (request) {
+                  this._distributorDetailsList = request.response.results;
+                          }.bind(this))
+
+                  .catch(this.fire.bind(this, 'toast', {message: 'Failed to load Distributors', type: 'danger'}))
+                  .finally(this.set.bind(this, 'refreshing', false));
+          },
+
+          //add function
+          _add : function (params) {
+            var body = {};
+            body.id = params.id;
+            body.name = params.name;
+            body.contactNumber = params.contactNumber;
+            body.address = params.address;
+            this.$.distributorsApi.addDistributor(JSON.stringify(body))
+            .then(this.fire.bind(this, 'toast', {message: 'Successfully added new Distributor.', type: 'success'}))
+                  .catch(this.fire.bind(this, 'toast', {message: 'Error adding Distributor.', type: 'danger'}))
+                  .finally(function(){
+                      this.refreshing = false;
+                  });
+          },
+
+          //update record function
+          _update : function (distributor, id) {
+            this.$.distributorsApi.updateDistributor(JSON.stringify(distributor), id)
+            .then(this.fire.bind(this, 'toast', {message: 'Successfully updated Distributor', type: 'success'}))
+                  .catch(this.fire.bind(this, 'toast', {message: 'Error updating Distributor.', type: 'danger'}))
+                  .finally(function(){
+                      this.refreshing = false;
+                  });
+          },
+
+          //delete  function
+          _delete : function (e) {
+            var id = e.detail.id;
+            this.$.distributorsApi.deleteDistributor(id)
+            .then(this.fire.bind(this, 'toast', {message: 'Successfully deleted Distributor', type: 'success'}))
+                  .catch(this.fire.bind(this, 'toast', {message: 'Error deleting Distributor.', type: 'danger'}))
+                  .finally(function(){
+                      this.refreshing = true;
+                  });
           },
       });
   </script>
