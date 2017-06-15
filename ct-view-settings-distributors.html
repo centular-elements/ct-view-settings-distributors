@@ -4,9 +4,11 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../iron-form/iron-form.html">
-<link rel="import" href="../ct-core-utils/ct-api-consumer-behaviour.html">
+
 <link rel="import" href="../ct-delete-dialog/ct-delete-dialog.html">
 <link rel="import" href="../ct-editable-switcher/ct-editable-switcher.html">
+<link rel="import" href="../ct-core-utils/ct-api-consumer-behaviour.html">
+<link rel="import" href="../ct-distributors-api/ct-distributors-api.html">
 <!--
 `ct-view-settings-distributors`
 Element to add and view distributor settings
@@ -206,110 +208,6 @@ Element to add and view distributor settings
     <ct-delete-dialog id='deleteDialog'  subject"Distributor"></ct-delete-dialog>
   </template>
   <script>
-  // Polymer({
-  //         is: 'ct-view-settings-distributors',
-  //         properties: {
-  //             _isStatusEdit : {
-  //                 type: Boolean,
-  //                 value: function() {
-  //                     return false;
-  //                 }
-  //             },
-  //             distributorDetailsList:Array,
-  //             selected: Number,
-  //         },
-  //         listeners: {
-  //             'iron-form-presubmit':'_formHandler',
-  //             'delete' : '_deleteDistributor',
-  //             '_fomrHandler': '_editFormHandler'
-  //         },
-  //         _submitForm : function() {
-  //             this.$.form.submit();
-  //         },
-  //         _formHandler : function(e){
-  //             e.preventDefault();
-  //             var form = this.$.form;
-  //             if(form.validate()) {
-  //                 var formData = form.serialize();
-  //                 data = {};
-  //                 data.name = formData.name;
-  //                 data.contactNumber = formData.contactNumber;
-  //                 data.address = formData.address;
-  //             }
-  //             this.fire('addDistributor', data);
-  //         },
-  //         _computeId : function(idx){
-  //             return 'item-'+idx;
-  //         },
-  //         _computeButtonIcon: function(element){
-  //             if(icon === 'save') {
-  //                 element.setAttribute('icon', 'create');
-  //             } else if(icon === 'create') {
-  //                 element.setAttribute('icon', 'save');
-  //             }
-  //         },
-  //         _computeBtnStyle : function(element){
-  //             if(element.classList.contains('btn-primary')) {
-  //                 element.classList.remove('btn-primary');
-  //                 element.classList.add('btn-default');
-  //             } else if(element.classList.contains('btn-default')){
-  //                 element.classList.remove('btn-default');
-  //                 element.classList.add('btn-primary');
-  //             }
-  //         },
-  //         _toggleStatus : function(element){
-  //             //toggles between editable and non editable
-  //             this._isStateEdit = !this._isStateEdit;
-  //         },
-  //         _editHandler : function(e){
-  //             var idIdx = '.item-'+e.model.index;
-  //             var inputElems = Polymer.dom(this.root).querySelectorAll(idIdx);
-  //             var isValid = true;
-  //             //if in editing state
-  //             if(this._isStateEdit){
-  //               inputElems.forEach(function(elem){
-  //                   if(elem.editMode && !elem.validate()){
-  //                       isValid = false;
-  //                   }
-  //                   if(isValid){
-  //                       elem.editMode = !elem.editMode;
-  //                   }
-  //               });
-  //               //submit the form
-  //               if(isValid){
-  //                 this._editFormHandler(e);
-  //               }
-  //             //make editable
-  //             } else {
-  //                this._toggleStatus();
-  //              }
-  //         },
-  //          _editFormHandler: function(e){
-  //            var idIdx = '#form-'+e.model.item.id;
-  //            var formElems = this.$$(idIdx);
-  //            if(!formElems.validate()){
-  //               return;
-  //             }
-  //             var editForm = formElems.serialize()
-  //                 data = {};
-  //             e.preventDefault();
-  //             data.id = e.model.item.id;
-  //             data.name = editForm.name;
-  //             data.contactNumber = editForm.contactNumber;
-  //             data.address = editForm.address;
-  //             this.fire('updateDistributor', data);
-  //             this._toggleStatus();
-  //         },
-  //         _modalHandler : function(e){
-  //           this.$.deleteDialog.key = e.model.item.id;
-  //           this.$.deleteDialog.resource = e.model.item.name
-  //           this.$.deleteDialog.subject = "Distrubutor"
-  //           this.$.deleteDialog.open();
-  //         },
-  //         _deleteDistributor : function(e) {
-  //             this.fire('deleteDistributor', e.detail);
-  //         },
-  //     });
 
   Polymer({
 
