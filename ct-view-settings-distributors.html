@@ -289,13 +289,7 @@ Element to add and view distributor settings
               var newDistributorInput = this.$.newDistributor;
 
               if(newDistributorInput.validate()){
-                var obj = {
-                  "name" : newDistributorInput.name,
-                  "contactNumber" : newDistributorInput.contactNumber,
-                  "address" : newDistributorInput.address
-                }
-
-
+                var obj = newDistributorInput.serialize()
                 this._add(obj)
               }
 
