@@ -146,8 +146,20 @@ Element to add and view distributor settings
                     </div>
                   </div>
                 </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+
+
                 <template is="dom-repeat" items="{{_distributorDetailsList}}">
-                  <div class="row dom-repeated-row margin-10v">
+                  <form
+                            is="iron-form"
+                            class="row"
+                            id="editForm-[[item.id]]"
+                            disable-native-validation-ui
+                            method="PUT"
+                            novalidate>
 
                     <div class="col-xs-3 col-input">
                       <div class="bordered-content">
@@ -201,11 +213,13 @@ Element to add and view distributor settings
                           <paper-icon-button icon="delete"  data-item-id$="[[index]]" class="table-button btn-danger btn-sm" on-tap="_modalHandler" raised></paper-icon-button>
                         </div>
                       </div>
-                    </div>
+                    </form>
 
                 </template>
-
+              </div>
             </div>
+
+
           </div>
         </div>
     </paper-material>
@@ -266,18 +280,22 @@ Element to add and view distributor settings
 
           _editHandler : function(e){
 
-              var switcherID = '#item-'+ e.distributor.index;
+              var switcherID = '#item-'+ e.distributors.index;
               var switcher = this.$$(switcherID);
 
               if(switcher.editMode){
                 if(switcher.validate()){
                   var inputID = '#item-'+ e.distributor.item.id;
                   var value = this.$$(inputID).value;
+                  var newDistributorEdit = this.$.editForm;
+                  var editObj = newDistributorEdit.serialize()
                   switcher.editMode = !switcher.editMode;
                   //send the body for the update
-                  this._update({"name": value}, e.distributor.item.name);
-                  this._update({"contactNumber": value}, e.distributor.item.contactNumber)
-                  this._update({"address": value}, e.distributor.item.address)
+                    this._update(editObj);
+
+                  // this._update({"name": value}, e.distributor.item.name);
+                  // this._update({"contactNumber": value}, e.distributor.item.contactNumber);
+                  // this._update({"address": value}, e.distributor.item.address);
                 }
               }else{
                 switcher.editMode = !switcher.editMode
@@ -303,7 +321,7 @@ Element to add and view distributor settings
           },
           init : function(){
               this.refreshing = true;
-          //    this._getList();
+              this._getList();
           },
           _modalHandler : function(e){
             this.$.deleteDialog.key = e.distributor.item.id;
