@@ -76,12 +76,16 @@ Element to add and view distributor settings
         width: calc(~100% - 10px);
       }
     </style>
-    <ct-distrubutor-api id="distributorsApi"></ct-distrubutor-api>
+    <ct-distributors-api id="distributorsApi"></ct-distributors-api>
     <paper-material>
       <div class="fluid-container new-container margin-10v">
-        <div class="row">
-
-
+        <form
+                is="iron-form"
+                class="row"
+                id="newDistributor"
+                disable-native-validation-ui
+                method="POST"
+                novalidate>
           <div class="col-sm-3">
             <paper-input
                     id="newDistName"
@@ -113,7 +117,7 @@ Element to add and view distributor settings
           <div class="col-sm-2 bordered">
             <paper-button class="btn btn-primary btn-block" on-tap="_newHandler" raised>Add Distributor</paper-button>
           </div>
-      </div>
+      </form>
     </div>
     </paper-material>
     <paper-material>
@@ -290,6 +294,7 @@ Element to add and view distributor settings
                   "contactNumber" : newDistributorInput.contactNumber,
                   "address" : newDistributorInput.address
                 }
+
 
                 this._add(obj)
               }
