@@ -156,14 +156,14 @@ Element to add and view distributor settings
                   <form
                             is="iron-form"
                             class="row"
-                            id="editForm-[[item.id]]"
+                            id="[[_computeId('editForm',index)]]"
                             disable-native-validation-ui
                             method="PUT"
                             novalidate>
 
                     <div class="col-xs-3 col-input">
                       <div class="bordered-content">
-                        <ct-editable-switcher id="[[_computeId("name",index)]]"  value-prop="[[item.name]]">
+                        <ct-editable-switcher id="[[_computeId('name',index)]]"  value-prop="[[item.name]]">
                           <paper-input
                                   class="input-element"
                                   id="item-[[item.id]]"
@@ -178,7 +178,7 @@ Element to add and view distributor settings
                     </div>
                       <div class="col-xs-3 col-input">
                         <div class="bordered-content">
-                          <ct-editable-switcher id="[[_computeId("number",index)]]"  value-prop="[[item.contactNumber]]">
+                          <ct-editable-switcher id="[[_computeId('number',index)]]"  value-prop="[[item.contactNumber]]">
                             <paper-input
                                     class="input-element"
                                     id="item-[[item.id]]"
@@ -194,7 +194,7 @@ Element to add and view distributor settings
                       </div>
                       <div class="col-xs-3 col-input">
                         <div class="bordered-content">
-                          <ct-editable-switcher id="[[_computeId("address",index)]]" value-prop="[[item.address]]">
+                          <ct-editable-switcher id="[[_computeId('address',index)]]" value-prop="[[item.address]]">
                           <paper-input
                                   class="input-element"
                                   id="item-[[item.id]]"
@@ -280,30 +280,33 @@ Element to add and view distributor settings
 
           _editHandler : function(e){
 
-              var nameSwitcherID = 'name-'+ e.model.index;
-              var numberSwitcherID = 'number-'+ e.model.index;
-              var addressSwitcherID = 'address-'+ e.model.index;
-              console.log(nameSwitcherID,numberSwitcherID,addressSwitcherID);
+              var editFormID = '#editForm-'+ e.model.index;
+              var editForm = this.$$(editFormID);
+              var nameSwitcher = Polymer.dom(editForm).querySelector('#name-'+ e.model.index);
+              var numberSwitcher = Polymer.dom(editForm).querySelector('#number-'+ e.model.index);
+              var addressSwitcher = Polymer.dom(editForm).querySelector('#address-'+ e.model.index);
 
-              var nameSwitcher = this.$$(nameSwitcherID);
-              console.log(nameSwitcher);
-              // if(switcher.editMode){
-              //   if(switcher.validate()){
-              //     var inputID = '#item-'+ e.model.item.id;
-              //     var value = this.$$(inputID).value;
-              //     var newDistributorEdit = this.$.editForm;
-              //     var editObj = newDistributorEdit.serialize()
-              //     switcher.editMode = !switcher.editMode;
-              //     //send the body for the update
-              //       this._update(editObj);
-              //
-              //     // this._update({"name": value}, e.distributor.item.name);
-              //     // this._update({"contactNumber": value}, e.distributor.item.contactNumber);
-              //     // this._update({"address": value}, e.distributor.item.address);
-              //   }
-              // }else{
-              //   switcher.editMode = !switcher.editMode
-              // }
+              console.log(editForm, nameSwitcher, numberSwitcher,addressSwitcher);
+
+              if (nameSwitcher.editMode) {
+                  if (editForm.validate())
+
+                  {
+                    var editObj = editForm.serialize();
+                    editObj.id = e.model.item.id;
+                    this._update(editObj)
+                    console.log(editObj);
+                    console.log(e.model.item.id);
+                   nameSwitcher.editMode = false;
+                   numberSwitcher.editMode = false;
+                   addressSwitcher.editMode = false;
+                  }
+                } else {
+                 nameSwitcher.editMode = true;
+                 numberSwitcher.editMode = true;
+                 addressSwitcher.editMode = true;
+                }
+
           },
 
           _newHandler : function(){
@@ -364,7 +367,7 @@ Element to add and view distributor settings
 
           //update record function
           _update : function (distributor, id) {
-            this.$.distributorsApi.updateDistributor(JSON.stringify(distributor), id)
+            this.$.distributorsApi.updateDistributor(distributor, id)
             .then(this.fire.bind(this, 'toast', {message: 'Successfully updated Distributor', type: 'success'}))
                   .catch(this.fire.bind(this, 'toast', {message: 'Error updating Distributor.', type: 'danger'}))
                   .finally(function(){
