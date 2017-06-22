@@ -294,7 +294,7 @@ Element to add and view distributor settings
                   {
                     var editObj = editForm.serialize();
                     editObj.id = e.model.item.id;
-                    this._update(editObj)
+                    this._update(editObj, editObj.id)
                     console.log(editObj);
                     console.log(e.model.item.id);
                    nameSwitcher.editMode = false;
