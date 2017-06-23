@@ -331,8 +331,8 @@ Element to add and view distributor settings
               this._getList();
           },
           _modalHandler : function(e){
-            this.$.deleteDialog.key = e.distributor.item.id;
-            this.$.deleteDialog.resource = e.distributor.item.name
+            this.$.deleteDialog.key = e.model.item.id;
+            this.$.deleteDialog.resource = e.model.item.name
             this.$.deleteDialog.subject = "Distributor"
             this.$.deleteDialog.open();
           },
